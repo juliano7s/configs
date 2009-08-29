@@ -1,0 +1,116 @@
+"This vim script can be used when editing xml files.
+"
+" source it, or runtime it from ftplugin/xml.vim.
+"
+" Usage:
+"
+"    when inserting type:
+"
+"    word,,,
+"
+"    This gets immediately translated to
+"    <para>
+"    </para>
+"    If word is not alone on a line the xml element is kept on one line.
+"	<para><emphasis>hello</emphasis></para>
+"
+"	Does not work with xml elements with just one character (such as p in
+"	html) 
+"
+" Bart van Deenen , www.vandeenensupport.com
+
+function! Make_element()
+	if match(getline('.'),'^\s*'.@".'\s*$') == -1
+		"the deleted word was not alone on the line
+		 let @w = "i<ea></pa>F<i"
+	else
+		"the deleted word was on it's own on the line
+		 let @w = "i<ea></pa>O  "
+	endif
+endfunction
+
+function! Make_element_single_line()
+  let @w = "i<ea></pa>F<i"
+endfunction
+
+function! Make_element_short()
+	if match(getline('.'),'^\s*'.@".'\s*$') == -1
+		"the deleted word was not alone on the line
+		 let @w = "i<ea/>F/i"
+	else
+		"the deleted word was on it's own on the line
+		 let @w = "i<ea/>F/i"
+	endif
+endfunction
+
+
+function! Make_element_ref()
+    if match(getline('.'),'^\s*'.@".'\s*$') == -1
+	  "the deleted word was not alone on the line
+		 let @w = "i<REF NAME=\"ea\" />"
+    else
+		"the deleted word was on it's own on the line
+		 let @w = "i<REF NAME=\"ea\" />"
+    endif
+endfunction
+
+function! Make_element_cnt()
+	if match(getline('.'),'^\s*'.@".'\s*$') == -1
+		"the deleted word was not alone on the line
+		 let @w = "i<CONSTANT NAME=\"ea\"></CONSTANT>F<i"
+	else
+		"the deleted word was on it's own on the line
+		 let @w = "i<CONSTANT NAME=\"ea\"></CONSTANT>ko  "
+	endif
+endfunction
+
+
+function! Make_element_trait()
+	if match(getline('.'),'^\s*'.@".'\s*$') == -1
+		"the deleted word was not alone on the line
+		 let @w = "i<TRAIT NAME=\"ea\"></TRAIT>F<i"
+	else
+		"the deleted word was on it's own on the line
+		 let @w = "i<TRAIT NAME=\"ea\"></TRAIT>kA"
+	endif
+endfunction
+
+function! Make_element_auto_trait()
+	if match(getline('.'),'^\s*'.@".'\s*$') == -1
+		"the deleted word was not alone on the line
+		 let @w = "i<TRAIT NAME=\"ea_\"><REF NAME=\"pa\" /></TRAIT>"
+	else
+		"the deleted word was on it's own on the line
+		 let @w = "i<TRAIT NAME=\"ea_\"><REF NAME=\"pa\" /></TRAIT>"
+	endif
+endfunction
+
+function! Make_element_comment()
+	let @w = "i<!-- ea -->F i"
+endfunction
+
+function! Make_element_int()
+	let @w = "i<INTEGER VALUE=\"ea\"/>$i"
+endfunction
+
+function! Make_element_string()
+	let @w = "i<STRING VALUE=\"Ea\"/>$i"
+endfunction
+
+function! Quote_string()
+	let @w = "i\"pa\"a"
+endfunction
+
+"include colon(58) for namespaces in xsl for instance
+setlocal iskeyword=@,48-57,_,192-255,58
+imap <buffer>  ,, <Esc>bye:call Make_element()<enter>@w
+imap <buffer>  ,. <Esc>bye:call Make_element_single_line()<enter>@w
+imap <buffer>  ,s <Esc>bye:call Make_element_short()<enter>@w
+imap <buffer>  ,r <Esc>bye:call Make_element_ref()<enter>@w
+imap <buffer>  ,c <Esc>bye:call Make_element_cnt()<enter>@w
+imap <buffer>  ,t <Esc>bye:call Make_element_trait()<enter>@w
+imap <buffer>  ,at <Esc>bye:call Make_element_auto_trait()<enter>@w
+imap <buffer> ,- <Esc>bye:call Make_element_comment()<enter>@w
+imap <buffer> ,i <Esc>wbye:call Make_element_int()<enter>@w
+imap <buffer> ,S <Esc>wByE:call Make_element_string()<enter>@w
+imap <buffer> ,q <Esc>wbdw:call Quote_string()<enter>@w
